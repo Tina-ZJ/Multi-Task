@@ -85,8 +85,10 @@ class Model:
             self.recall = tf.div(self.tp, self.tp+self.fn, name='recall')
             self.f1 = tf.div(2*self.precision*self.recall, self.precision+self.recall, name='F1')
             # for tag acc
-            tag_acc = tf.reduce_sum(tf.cast(tf.equal(tf.cast(self.tag_predictions, tf.int32) - self.input_tag, 0), tf.float32))
-            self.tag_acc = tf.div(tag_acc, self.tag_predictions.shape[0].value*10,  name='tag_precision')
+            correct = tf.cast(tf.equal(tf.cast(self.tag_predictions, tf.int32) - self.input_tag, 0), tf.float32)
+            correct = tf.reduce_sum(self.input_mask * correct)
+            self.tag_acc = tf.div(correct, tf.cast(tf.reduce_sum(self.length), tf.float32))
+            
             
         if multi_label_flag:
             print("going to use multi label loss.")
